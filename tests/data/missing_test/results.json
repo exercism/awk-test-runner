@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "status": "pass",
+  "test-environment": {
+    "gawk": "GNU Awk 5.1.0, API: 3.0 (GNU MPFR 4.1.0, GNU MP 6.2.1)",
+    "bats": "Bats 1.7.0",
+    "OS": "Ubuntu 22.04 LTS"
+  },
+  "tests": []
+}
