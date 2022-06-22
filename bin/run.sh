@@ -53,11 +53,13 @@ run_tests() {
 
     local test_file
     if [[ -f .meta/config.json ]]; then
+        # production test runner
         test_file=$(jq -r '.files.test[0]' .meta/config.json)
+    elif [[ -f .exercism/config.json ]]; then
+        # local testing
+        test_file=$(jq -r '.files.test[0]' .exercism/config.json)
     else
-        test_file="${slug//-/_}.bats"
-        # test scripts may be (old) xxxx_test.sh
-        [[ -f "$test_file" ]] || test_file="${slug//-/_}_test.sh"
+        test_file="test-${slug}.bats"
     fi
 
     echo "Test output:"
