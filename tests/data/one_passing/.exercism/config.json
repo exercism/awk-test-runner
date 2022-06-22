@@ -1,0 +1,8 @@
+{
+    "files": {
+        "solution": ["one_passing.sh"],
+        "test": ["one_passing.bats"],
+        "example": [".meta/example.sh"]
+    }
+}
+

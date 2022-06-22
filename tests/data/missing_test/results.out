@@ -1,1 +1,1 @@
-Error: Test file "/home/glennj/src/exercism/tooling/awk-test-runner/tests/data/missing_test/missing_test_test.sh" does not exist
+Error: Test file "/opt/test-runner/tests/data/missing_test/test-missing_test.bats" does not exist

@@ -10,8 +10,8 @@
     {
       "name": "say hello",
       "status": "fail",
-      "test_code": "run -127 bash one_passing.sh\n[ \"$status\" -eq 0 ]\n[ \"$output\" == \"Hello, World!\" ]",
-      "message": "(in test file missing_script.bats, line 7)\n  `[ \"$status\" -eq 0 ]' failed\n"
+      "test_code": "run -127 bash no_such_file_here.sh\n[ \"$status\" -eq 0 ]\n[ \"$output\" == \"Hello, World!\" ]",
+      "message": "(in test file test-missing_script.bats, line 7)\n  `[ \"$status\" -eq 0 ]' failed\n"
     }
   ]
 }

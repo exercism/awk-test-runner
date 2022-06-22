@@ -14,7 +14,7 @@ actual_matches_expected() {
     [[ "$(jq .version "$actual")" == "$(jq .version "$expected")" ]] &&
     [[ "$(jq .status "$actual")" == "$(jq .status "$expected")" ]] &&
     [[ "$(jq .tests "$actual")" == "$(jq .tests "$expected")" ]] &&
-    [[ -n "$(jq '."test-environment".bash' "$actual")" ]] &&
+    [[ -n "$(jq '."test-environment".gawk' "$actual")" ]] &&
     [[ -n "$(jq '."test-environment".bats' "$actual")" ]]
 }
 
