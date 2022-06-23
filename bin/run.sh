@@ -123,52 +123,55 @@ build_report() {
 
     readarray -t output < "$output_file"
 
-    if [[ ${output[0]} =~ ^([0-9]+)\.\.([0-9]+)$ ]]; then
-        local first_test="${BASH_REMATCH[1]}"
-        local last_test="${BASH_REMATCH[2]}"
-        local test_count=$((last_test - first_test + 1))
-    else
+    # first line in TAP output should be test plan: `1..10`
+    if [[ ! ${output[0]} =~ ^([0-9]+)\.\.([0-9]+)$ ]]; then
         error "$output_file" "$json_result_file"
         return 1
     fi
 
+    local first_test="${BASH_REMATCH[1]}"
+    local last_test="${BASH_REMATCH[2]}"
+    local test_count=$((last_test - first_test + 1))
+
     echo "Tried to run $test_count tests according to TAP plan."
 
-    local results
+    # process the rest of the TAP output
     local status="pass"
-    local test_body
+    local results test_body failed test_name
+    local error_message
 
     for ((i = 1; i < ${#output[@]}; i++)); do
-        if [[ ${output[$i]} =~ ^(not )?ok\ [0-9]+\ (.*)$ ]]; then
-            local failed="${BASH_REMATCH[1]}"
-            local test_name="${BASH_REMATCH[2]}"
-        else
-            error "$output_file" "$json_result_file"
-            return 1
+        if [[ ${output[i]} =~ ^"# "(.*) ]]; then
+            error_message+="${BASH_REMATCH[1]}"$'\n'
+
+        elif [[ ${output[i]} =~ ^(not )?ok\ [0-9]+\ (.*)$ ]]; then
+            # start of new test
+            # add _previous_ to results
+            if [[ -n $test_name ]]; then
+                if [[ -z $failed ]]; then
+                    results+=("$(print_passed_test "$test_name" "$test_body")")
+                else
+                    status="fail"
+                    results+=("$(print_failed_test "$test_name" "$error_message" "$test_body")")
+                fi
+            fi
+
+            failed=${BASH_REMATCH[1]}
+            test_name=${BASH_REMATCH[2]}
+            test_body=${test_bodies[$test_name]:-}
+            error_message=""
         fi
+    done
 
-        test_body=${test_bodies[$test_name]:-}
-
+    # last test
+    if [[ -n $test_name ]]; then
         if [[ -z $failed ]]; then
             results+=("$(print_passed_test "$test_name" "$test_body")")
         else
             status="fail"
-
-            local error_message=""
-
-            for ((j = i + 1; j < ${#output[@]}; j++)); do
-                if [[ ${output[$j]} =~ ^#\ (.*)$ ]]; then
-                    error_message+="${BASH_REMATCH[1]}"$'\n'
-                else
-                    break
-                fi
-            done
-
             results+=("$(print_failed_test "$test_name" "$error_message" "$test_body")")
-
-            ((i = j - 1))
         fi
-    done
+    fi
 
     print_report "$status" "${results[@]}" > "$json_result_file"
 
