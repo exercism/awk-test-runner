@@ -1,0 +1,7 @@
+{
+    "files": {
+        "solution": ["script.awk"],
+        "test": ["tests.bats"]
+    }
+}
+
