@@ -1,0 +1,24 @@
+{
+  "version": 3,
+  "status": "pass",
+  "tests": [
+    {
+      "name": "say one",
+      "status": "pass",
+      "test_code": "run bash with_tasks.sh one\n[ \"$status\" -eq 0 ]\n[ \"$output\" == \"one\" ]",
+      "task_id": "1"
+    },
+    {
+      "name": "say two",
+      "status": "pass",
+      "test_code": "run bash with_tasks.sh two\n[ \"$status\" -eq 0 ]\n[ \"$output\" == \"two\" ]",
+      "task_id": "1"
+    },
+    {
+      "name": "say three",
+      "status": "pass",
+      "test_code": "run bash with_tasks.sh three\n[ \"$status\" -eq 0 ]\n[ \"$output\" == \"three\" ]",
+      "task_id": "2"
+    }
+  ]
+}

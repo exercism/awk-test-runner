@@ -36,6 +36,15 @@ actual_matches_expected() {
     actual_matches_expected "$TEST_DIR/results.json" "$TEST_DIR/expected_results.json"
 }
 
+@test "with task ids" {
+    TEST="with_tasks"
+    TEST_DIR="$DATA_DIR/$TEST"
+    run "$RUN_SCRIPT" "$TEST" "$TEST_DIR" "$TEST_DIR"
+
+    [[ "$status" -eq 0 ]]
+    actual_matches_expected "$TEST_DIR/results.json" "$TEST_DIR/expected_results.json"
+}
+
 @test "first test fails" {
     TEST="first_fails"
     TEST_DIR="$DATA_DIR/$TEST"
