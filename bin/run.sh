@@ -14,8 +14,8 @@
 # then parses that TAP file to produce the JSON file.
 
 # the version of the test-runner interface:
-# https://github.com/exercism/docs/blob/50bcff91e8871f08b9a69b76ccbd45e5a90493dd/building/tooling/test-runners/interface.md
-INTERFACE_VERSION=2
+# https://exercism.org/docs/building/tooling/test-runners/interface
+INTERFACE_VERSION=3
 
 main() {
     echo "Running exercise tests for AWK"
@@ -35,6 +35,7 @@ main() {
     local json_result_file="$output_dir/results.json"
 
     local -A test_bodies    # populated in get_test_bodies
+    local -A task_ids       # populated in get_test_bodies
 
     run_tests "$slug" "$solution_dir" "$output_file"
     build_report "$output_file" "$json_result_file"
@@ -75,10 +76,11 @@ run_tests() {
 
 get_test_bodies() {
     local test_file=$1
-    local name line indent
+    local name line indent task_id
     local state="out"
     local body=()
     test_bodies=()
+    task_ids=()
 
     local start_test_re='^@test ['\''"](.+)['\''"] \{[[:blank:]]*$'
     local end_test_re='^\}[[:blank:]]*$'
@@ -90,11 +92,15 @@ get_test_bodies() {
                     name=${BASH_REMATCH[1]}
                     body=()
                     state="in"
+                    unset task_id
                 fi
                 ;;
             in)
                 if [[ $line =~ $end_test_re ]]; then
                     test_bodies["$name"]=$(printf '%s\n' "${body[@]}")
+                    if [[ -v task_id ]]; then
+                        task_ids["$name"]=$task_id
+                    fi
                     state="out"
                 elif [[ $line == *BATS_RUN_SKIPPED*skip* ]]; then
                     # skip the skips
@@ -102,6 +108,8 @@ get_test_bodies() {
                 elif ((${#body[@]} == 0)) && [[ $line == *([[:blank:]]) ]]; then
                     # ignore blank lines at the top of the test body
                     continue
+                elif [[ $line =~ "## task "([0-9]+) ]]; then
+                    task_id=${BASH_REMATCH[1]}
                 else
                     # We want to unindent the body: find the indentation of the first line.
                     ((${#body[@]} == 0)) && indent=${line%%[^[:blank:]]*}
@@ -223,27 +231,44 @@ tool_versions() {
     jq  --null-input \
         --arg gawk "$(gawk --version | head -1)" \
         --arg bats "$(bats --version)" \
-        --arg OS "$(. /etc/lsb-release; echo "$DISTRIB_DESCRIPTION")" \
+        --arg OS "$(
+                # probably don't need this complexity, but ...
+                if [[ -f /etc/lsb-release ]]; then
+                    . /etc/lsb-release; echo "$DISTRIB_DESCRIPTION"
+                elif command -v uname >/dev/null; then
+                    uname -sro
+                else
+                    echo "Doesn't look like Linux..."
+                fi
+            )" \
         '$ARGS.named'
 }
 
 print_failed_test() {
     # Print result of failed test as JSON.
-    jq  --null-input \
-        --arg name "$1" \
-        --arg message "$2" \
-        --arg code "$3" \
-        --arg status "fail" \
-        '{name: $name, status: $status, test_code: $code, message: $message}'
+    local args=(
+        --arg name "$1"
+        --arg status "fail"
+        --arg test_code "$3"
+        --arg message "$2"
+    )
+    if [[ "${task_ids["$1"]}" ]]; then
+        args+=( --arg task_id "${task_ids["$1"]}" )
+    fi
+    jq --null-input "${args[@]}" '$ARGS.named'
 }
 
 print_passed_test() {
     # Print result of passed test as JSON.
-    jq  --null-input \
-        --arg name "$1" \
-        --arg code "$2" \
-        --arg status "pass" \
-        '{name: $name, status: $status, test_code: $code}'
+    local args=(
+        --arg name "$1"
+        --arg status "pass"
+        --arg test_code "$2"
+    )
+    if [[ "${task_ids["$1"]}" ]]; then
+        args+=( --arg task_id "${task_ids["$1"]}" )
+    fi
+    jq --null-input "${args[@]}" '$ARGS.named'
 }
 
 main "$@"

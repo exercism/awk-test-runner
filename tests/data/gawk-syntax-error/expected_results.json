@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "status": "fail",
   "test-environment": {
     "gawk": "GNU Awk 5.1.0, API: 3.0 (GNU MPFR 4.1.0, GNU MP 6.2.1)",
