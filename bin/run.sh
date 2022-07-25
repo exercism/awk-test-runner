@@ -238,7 +238,7 @@ tool_versions() {
                 elif command -v uname >/dev/null; then
                     uname -sro
                 else
-                    echo "doesn't look like linux..."
+                    echo "Doesn't look like Linux..."
                 fi
             )" \
         '$ARGS.named'
