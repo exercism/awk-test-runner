@@ -27,10 +27,10 @@ solution_dir=$(realpath "${2%/}")
 output_dir=$(realpath "${3%/}")
 
 # Create the output directory if it doesn't exist
-mkdir -p "${output_dir}"
+mkdir --parents "${output_dir}"
 
 # Build the Docker image
-docker build --rm -t exercism/awk-test-runner .
+docker build --rm --tag exercism/awk-test-runner .
 
 # Run the Docker image using the settings mimicking the production environment
 docker run \
