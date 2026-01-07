@@ -13,9 +13,9 @@ RUN apt-get update                                                              
     apt-get clean                                                               && \
     rm --recursive --force /var/lib/apt/lists/*
 
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US:en
-ENV LC_ALL en_US.UTF-8
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US:en
+ENV LC_ALL=en_US.UTF-8
 
 WORKDIR /opt/test-runner
 COPY . .
