@@ -1,9 +1,11 @@
-FROM ubuntu:26.04@sha256:f144425ff09be612d6d9ad965196e9cdc23dae1f42110a8a11a3e9a8198759f7
+FROM ubuntu:26.04@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c
 
 # Ubuntu 24.04 'noble numbat' gets us:
 # gawk v5.2.1           https://launchpad.net/ubuntu/noble/+source/gawk
 # jq   v1.7.1           https://launchpad.net/ubuntu/noble/+source/jq
-# bats v1.10.0          https://launchpad.net/ubuntu/noble/+source/bats
+# gawk  5.3.2          https://launchpad.net/ubuntu/noble/+source/gawk
+# jq   v1.8.1           https://launchpad.net/ubuntu/noble/+source/jq
+# bats v1.13.0          https://launchpad.net/ubuntu/noble/+source/bats
 
 RUN apt-get update                                                              && \
     apt-get install --assume-yes --no-install-recommends gawk jq bats locales   && \
